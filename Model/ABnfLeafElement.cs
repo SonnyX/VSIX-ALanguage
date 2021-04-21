@@ -1,9 +1,4 @@
-﻿
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Classification;
-using System.Collections.Generic;
-
-namespace ALittle
+﻿namespace ALittle
 {
     public class ABnfLeafElement : ABnfElement
     {

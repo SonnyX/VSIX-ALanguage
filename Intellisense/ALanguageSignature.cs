@@ -1,6 +1,5 @@
 ﻿
 using Microsoft.VisualStudio.Language.Intellisense;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using System;

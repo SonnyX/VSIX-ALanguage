@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Threading.Tasks;
 using Microsoft;
 using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Settings;
@@ -25,9 +18,6 @@ namespace ALittle
         private static AsyncLazy<ShellSettingsManager> s_settings_manager = new AsyncLazy<ShellSettingsManager>(GetSettingsManagerAsync, ThreadHelper.JoinableTaskFactory);
         private static T s_instance = null;
 
-        protected BaseOptionModel()
-        { }
-
         /// <summary>
         /// A singleton instance of the options. MUST be called from UI thread only.
         /// </summary>
@@ -38,7 +28,8 @@ namespace ALittle
         {
             get
             {
-                if (s_instance != null) return s_instance;
+                if (s_instance != null)
+                    return s_instance;
 
                 ThreadHelper.ThrowIfNotOnUIThread();
                 s_instance = ThreadHelper.JoinableTaskFactory.Run(GetLiveInstanceAsync);
@@ -51,23 +42,36 @@ namespace ALittle
         /// </summary>
         protected virtual string CollectionName { get; } = typeof(T).FullName;
 
+        protected BaseOptionModel()
+        { }
+
+        public static async Task<T> CreateAsync()
+        {
+            var instance = new T();
+            await instance.LoadAsync();
+            return instance;
+        }
+
+        /// <summary>
+        /// Get the singleton instance of the options. Thread safe.
+        /// </summary>
+        public static Task<T> GetLiveInstanceAsync() => s_live_model.GetValueAsync();
+
         /// <summary>
         /// Hydrates the properties from the registry asyncronously.
         /// </summary>
         public virtual async Task LoadAsync()
         {
             ShellSettingsManager manager = await s_settings_manager.GetValueAsync();
-            if (manager == null) return;
+            if (manager == null)
+                return;
             SettingsStore settingsStore = manager.GetReadOnlySettingsStore(SettingsScope.UserSettings);
-            if (settingsStore == null) return;
-            if (!settingsStore.CollectionExists(CollectionName)) return;
+            if (settingsStore == null)
+                return;
+            if (!settingsStore.CollectionExists(CollectionName))
+                return;
 
             LoadProperty(settingsStore);
-        }
-
-        protected virtual void LoadProperty(SettingsStore store)
-        {
-
         }
 
         /// <summary>
@@ -90,34 +94,26 @@ namespace ALittle
             }
         }
 
+        protected virtual void LoadProperty(SettingsStore store)
+        {
+        }
+
         protected virtual void SaveProperty(WritableSettingsStore store)
         {
-
         }
 
         private static async Task<ShellSettingsManager> GetSettingsManagerAsync()
         {
             var model = await AsyncServiceProvider.GlobalProvider.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
-            if (model == null) return null;
-            
+            if (model == null)
+                return null;
+
             var service_provider = model.GetService<SVsServiceProvider>();
-            if (service_provider == null) return null;
-            
+            if (service_provider == null)
+                return null;
+
             Assumes.Present(service_provider);
             return new ShellSettingsManager(service_provider);
         }
-
-        public static async Task<T> CreateAsync()
-        {
-            var instance = new T();
-            await instance.LoadAsync();
-            return instance;
-        }
-
-        /// <summary>
-        /// Get the singleton instance of the options. Thread safe.
-        /// </summary>
-        public static Task<T> GetLiveInstanceAsync() => s_live_model.GetValueAsync();
-
     }
 }

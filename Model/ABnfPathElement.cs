@@ -1,8 +1,4 @@
-﻿
-using Microsoft.VisualStudio.Text;
-using System.Collections.Generic;
-
-namespace ALittle
+﻿namespace ALittle
 {
     public class ABnfPathElement : ABnfElement
     {

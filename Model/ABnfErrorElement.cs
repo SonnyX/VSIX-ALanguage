@@ -1,9 +1,4 @@
-﻿
-using Microsoft.VisualStudio.Text;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-
-namespace ALittle
+﻿namespace ALittle
 {
     public class ABnfErrorElement : ABnfElement
     {

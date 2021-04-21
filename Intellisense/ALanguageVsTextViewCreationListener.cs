@@ -9,7 +9,6 @@ using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text.Tagging;
 using System;
-using System.Collections.Generic;
 
 namespace ALittle
 {

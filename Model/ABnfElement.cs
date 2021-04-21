@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ALittle
 {
@@ -10,7 +9,7 @@ namespace ALittle
         protected ABnfNodeElement m_parent = null;          // 父节点
         protected ABnfReference m_reference = null;         // 引用
 
-        protected string m_element_text = null;         // 文本缓存    
+        protected string m_element_text = null;         // 文本缓存
         protected int m_start = 0;                       // 文本偏移
         protected int m_line = 1;                        // 所在行
         protected int m_col = 1;                         // 所在列
@@ -32,7 +31,8 @@ namespace ALittle
         // 获取引用
         public ABnfReference GetReference()
         {
-            if (m_reference != null) return m_reference;
+            if (m_reference != null)
+                return m_reference;
 
             if (m_factory != null)
                 m_reference = m_factory.CreateReference(this);
@@ -40,6 +40,7 @@ namespace ALittle
                 m_reference = new ABnfReferenceTemplate<ABnfElement>(this);
             return m_reference;
         }
+
         // 获取类型
         public virtual ABnfGuessError GuessTypes(out List<ABnfGuess> guess_list)
         {
@@ -58,7 +59,7 @@ namespace ALittle
             if (guess_list == null || guess_list.Count == 0)
             {
                 guess = null;
-                return new ABnfGuessError(this, "未知类型");
+                return new ABnfGuessError(this, "Unknown type");
             }
 
             guess = guess_list[0];
@@ -67,30 +68,38 @@ namespace ALittle
 
         // 获取解析细节
         public ABnfFile GetFile() { return m_file; }
+
         // 获取文件全路径
         public virtual string GetFullPath()
         {
-            if (m_file == null) return null;
+            if (m_file == null)
+                return null;
             return m_file.GetFullPath();
         }
+
         // 获取所在工程路径
         public virtual string GetProjectPath()
         {
-            if (m_file == null) return null;
+            if (m_file == null)
+                return null;
             var project = m_file.GetProjectInfo();
-            if (project == null) return null;
+            if (project == null)
+                return null;
             return project.GetProjectPath();
         }
 
-        // 设置父节点
-        internal void SetParent(ABnfNodeElement parent) { m_parent = parent; }
-        public ABnfNodeElement GetParent() { return m_parent; }
+        public ABnfNodeElement GetParent()
+        {
+            return m_parent;
+        }
 
         // 当前节点是否和指定范围有交集
         public bool IntersectsWith(int start, int end)
         {
-            if (m_start >= end) return false;
-            if (GetEnd() <= start) return false;
+            if (m_start >= end)
+                return false;
+            if (GetEnd() <= start)
+                return false;
             return true;
         }
 
@@ -123,7 +132,8 @@ namespace ALittle
         // 获取文本
         public virtual string GetElementText()
         {
-            if (m_element_text != null) return m_element_text;
+            if (m_element_text != null)
+                return m_element_text;
             int start = GetStart();
             if (start >= m_file.GetLength())
             {
@@ -144,10 +154,12 @@ namespace ALittle
         public virtual string GetElementString()
         {
             int length = GetLength();
-            if (length <= 2) return "";
+            if (length <= 2)
+                return "";
             length -= 2;
             int start = GetStart() + 1;
-            if (start >= m_file.GetLength()) return "";
+            if (start >= m_file.GetLength())
+                return "";
             return m_file.Substring(start, length);
         }
 
@@ -156,6 +168,7 @@ namespace ALittle
 
         // 获取当前是第几列，从1开始算
         public virtual int GetStartCol() { return m_col; }
+
         // 计算indent
         public virtual int GetStartIndent()
         {
@@ -164,7 +177,8 @@ namespace ALittle
             int count = 0;
             for (int i = start; i < end; ++i)
             {
-                if (i >= m_file.m_text.Length) break;
+                if (i >= m_file.m_text.Length)
+                    break;
 
                 if (m_file.m_text[i] == '\t')
                     count += ALanguageSmartIndentProvider.s_indent_size;
@@ -177,6 +191,7 @@ namespace ALittle
 
         // 获取结束位置是第几列，从1开始算
         public virtual int GetEndLine() { return m_line; }
+
         // 获取结束位置是第几行，从1开始算
         public virtual int GetEndCol() { return m_col; }
 
@@ -185,21 +200,24 @@ namespace ALittle
 
         // 向前找到第一个\n并且，中间没有空格和\t
         public virtual int FindForwardFirstEnterAndHaveNotSpaceOrTab()
-		{
+        {
             int start = GetStart();
             int end = GetEnd() - 1;
             while (end >= 0 && m_file.m_text[end] != ' ' && m_file.m_text[end] != '\t' && m_file.m_text[end] != '\n')
                 --end;
 
             for (int i = end; i >= start; --i)
-			{
+            {
                 if (m_file.m_text[i] == ' ' || m_file.m_text[i] == '\t')
                     continue;
                 if (m_file.m_text[i] == '\n')
                     return i;
                 break;
-			}
+            }
             return -1;
-		}
+        }
+
+        // 设置父节点
+        internal void SetParent(ABnfNodeElement parent) { m_parent = parent; }
     }
 }

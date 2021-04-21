@@ -19,7 +19,7 @@ namespace ALittle
         protected string m_full_path;       // 文件全路径
         protected long m_version = 0;
 
-        // 符号配对
+        // Expected 配对
         Dictionary<string, string> m_left_pairs = new Dictionary<string, string>();
         Dictionary<string, string> m_right_pairs = new Dictionary<string, string>();
 

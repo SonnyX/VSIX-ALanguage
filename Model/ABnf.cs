@@ -1,10 +1,5 @@
-﻿
-using Microsoft.VisualStudio.Language.Intellisense;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Windows.Media;
 
 namespace ALittle
 {
@@ -44,21 +39,21 @@ namespace ALittle
         {
             use_key_rate = 1;
             if (create_key_count > 0)
-                use_key_rate = use_key_count / (double)create_key_count;
+                use_key_rate = use_key_count / (double) create_key_count;
 
             use_string_rate = 1;
             if (create_string_count > 0)
-                use_string_rate = use_string_count / (double)create_string_count;
+                use_string_rate = use_string_count / (double) create_string_count;
 
             use_regex_rate = 1;
             if (create_regex_count > 0)
-                use_regex_rate = use_regex_count / (double)create_regex_count;
+                use_regex_rate = use_regex_count / (double) create_regex_count;
 
             foreach (var create_pair in create_node_count_map)
             {
                 if (use_node_count_map.TryGetValue("ALittleScript" + create_pair.Key + "Element", out int use_count)
                     && create_pair.Value != 0)
-                    use_node_rate_map.Add(create_pair.Key, use_count / (double)create_pair.Value);
+                    use_node_rate_map.Add(create_pair.Key, use_count / (double) create_pair.Value);
                 else
                     use_node_rate_map.Add(create_pair.Key, 1);
             }
@@ -77,28 +72,34 @@ namespace ALittle
     public class ABnf
     {
         // ABnf规则对象
-        ABnfRule m_rule = new ABnfRule();
-        ABnfRuleInfo m_root = null;            // 规则入口
-        ABnfRuleInfo m_line_comment = null;    // 单行注释
-        ABnfRuleInfo m_block_comment = null;   // 多行注释
+        private ABnfRule m_rule = new ABnfRule();
+
+        private ABnfRuleInfo m_root = null;            // 规则入口
+        private ABnfRuleInfo m_line_comment = null;    // 单行注释
+        private ABnfRuleInfo m_block_comment = null;   // 多行注释
 
         // 节点工厂
-        ABnfFactory m_factory = null;
+        private ABnfFactory m_factory = null;
 
         // 正在解析的代码
-        ABnfFile m_file;
-        // 已经验证过的正则，用于缓存
-        Dictionary<int, Dictionary<ABnfRuleNodeInfo, int>> m_regex_skip = new Dictionary<int, Dictionary<ABnfRuleNodeInfo, int>>();
-        // 已经验证过的单行注释，用于缓存
-        HashSet<int> m_line_comment_skip = new HashSet<int>();
-        // 已经验证过的多行注释，用于缓存
-        HashSet<int> m_block_comment_skip = new HashSet<int>();
-        // 结束符栈
-        List<ABnfRuleInfo> m_stop_stack = new List<ABnfRuleInfo>();
-        // 统计
-        ABnfRuleStat m_stat = new ABnfRuleStat();
+        private ABnfFile m_file;
 
-        // 符号集合，当前符号如果遇到后面字符，那么就匹配失败
+        // 已经验证过的正则，用于缓存
+        private Dictionary<int, Dictionary<ABnfRuleNodeInfo, int>> m_regex_skip = new Dictionary<int, Dictionary<ABnfRuleNodeInfo, int>>();
+
+        // 已经验证过的单行注释，用于缓存
+        private HashSet<int> m_line_comment_skip = new HashSet<int>();
+
+        // 已经验证过的多行注释，用于缓存
+        private HashSet<int> m_block_comment_skip = new HashSet<int>();
+
+        // 结束符栈
+        private List<ABnfRuleInfo> m_stop_stack = new List<ABnfRuleInfo>();
+
+        // 统计
+        private ABnfRuleStat m_stat = new ABnfRuleStat();
+
+        // Expected 集合，当前Expected 如果遇到后面字符，那么就匹配失败
         private Dictionary<string, HashSet<char>> m_symbol_check = new Dictionary<string, HashSet<char>>();
 
         public ABnf()
@@ -185,42 +186,51 @@ namespace ALittle
                     list.Add(new ALanguageCompletionInfo(key, null));
             }
         }
-        
+
         public ABnfNodeElement CreateNodeElement(int line, int col, int offset, string type)
         {
-            if (m_stat != null) m_stat.CreateNode(type);
+            if (m_stat != null)
+                m_stat.CreateNode(type);
             var node = m_factory.CreateNodeElement(m_file, line, col, offset, type);
-            if (node == null) node = new ABnfNodeElement(m_factory, m_file, line, col, offset, type);
+            if (node == null)
+                node = new ABnfNodeElement(m_factory, m_file, line, col, offset, type);
             return node;
         }
 
         public ABnfKeyElement CreateKeyElement(int line, int col, int offset, string value)
         {
-            if (m_stat != null) m_stat.create_key_count++;
+            if (m_stat != null)
+                m_stat.create_key_count++;
             var node = m_factory.CreateKeyElement(m_file, line, col, offset, value);
-            if (node == null) node = new ABnfKeyElement(m_factory, m_file, line, col, offset, value);
+            if (node == null)
+                node = new ABnfKeyElement(m_factory, m_file, line, col, offset, value);
             return node;
         }
 
         public ABnfStringElement CreateStringElement(int line, int col, int offset, string value)
         {
-            if (m_stat != null) m_stat.create_string_count++;
+            if (m_stat != null)
+                m_stat.create_string_count++;
             var node = m_factory.CreateStringElement(m_file, line, col, offset, value);
-            if (node == null) node = new ABnfStringElement(m_factory, m_file, line, col, offset, value);
+            if (node == null)
+                node = new ABnfStringElement(m_factory, m_file, line, col, offset, value);
             return node;
         }
 
         public ABnfRegexElement CreateRegexElement(int line, int col, int offset, string value, Regex regex)
         {
-            if (m_stat != null) m_stat.create_regex_count++;
+            if (m_stat != null)
+                m_stat.create_regex_count++;
             var node = m_factory.CreateRegexElement(m_file, line, col, offset, value, regex);
-            if (node == null) node = new ABnfRegexElement(m_factory, m_file, line, col, offset, value, regex);
+            if (node == null)
+                node = new ABnfRegexElement(m_factory, m_file, line, col, offset, value, regex);
             return node;
         }
 
         public ABnfNodeElement Analysis(ABnfFile file)
         {
-            if (m_root == null) return null;
+            if (m_root == null)
+                return null;
 
             // 清空缓存
             m_regex_skip.Clear();
@@ -256,7 +266,7 @@ namespace ALittle
                     if (offset >= m_file.m_text.Length)
                         break;
                 }
-                node.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, "语法错误", null));
+                node.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, "Syntax Error", null));
 
                 // 跳到下一行
                 if (!JumpToNextLine(ref line, ref col, ref offset))
@@ -280,7 +290,7 @@ namespace ALittle
             return node;
         }
 
-        void StatElement(ABnfElement element)
+        private void StatElement(ABnfElement element)
         {
             if (element is ABnfKeyElement)
             {
@@ -317,7 +327,7 @@ namespace ALittle
         }
 
         // 分析规则语句
-        bool AnalysisABnfNode(ABnfRuleInfo rule, ABnfRuleNodeInfo node, ABnfNodeElement parent, bool not_key
+        private bool AnalysisABnfNode(ABnfRuleInfo rule, ABnfRuleNodeInfo node, ABnfNodeElement parent, bool not_key
             , ref int line, ref int col, ref int offset
             , ref int pin_offset, bool ignore_error)
         {
@@ -331,13 +341,15 @@ namespace ALittle
                     , ref temp_pin_offset, ignore_error))
                 {
                     // 如果匹配内部有pin，那么也要对外标记为pin
-                    if (temp_pin_offset >= 0) pin_offset = temp_pin_offset;
+                    if (temp_pin_offset >= 0)
+                        pin_offset = temp_pin_offset;
 
                     // 返回匹配失败
                     return false;
                 }
 
-                if (temp_pin_offset >= 0) pin_offset = temp_pin_offset;
+                if (temp_pin_offset >= 0)
+                    pin_offset = temp_pin_offset;
 
                 return true;
             }
@@ -352,13 +364,15 @@ namespace ALittle
                     , ref temp_pin_offset, ignore_error))
                 {
                     // 如果匹配内部有pin，那么也要对外标记为pin
-                    if (temp_pin_offset >= 0) pin_offset = temp_pin_offset;
+                    if (temp_pin_offset >= 0)
+                        pin_offset = temp_pin_offset;
 
                     // 返回匹配失败
                     return false;
                 }
 
-                if (temp_pin_offset >= 0) pin_offset = temp_pin_offset;
+                if (temp_pin_offset >= 0)
+                    pin_offset = temp_pin_offset;
 
                 // 匹配剩下的
                 return AnalysisABnfNodeMore(rule, node, parent, not_key
@@ -404,7 +418,7 @@ namespace ALittle
             return false;
         }
 
-        bool AnalysisABnfNodeMore(ABnfRuleInfo rule
+        private bool AnalysisABnfNodeMore(ABnfRuleInfo rule
             , ABnfRuleNodeInfo node, ABnfNodeElement parent, bool not_key
             , ref int line, ref int col, ref int offset
             , ref int pin_offset, bool ignore_error)
@@ -429,7 +443,8 @@ namespace ALittle
                     return true;
                 }
 
-                if (temp_pin_offset >= 0) pin_offset = temp_pin_offset;
+                if (temp_pin_offset >= 0)
+                    pin_offset = temp_pin_offset;
 
                 // 跳过注释
                 AnalysisABnfCommentMatch(rule, parent, not_key, ref line, ref col, ref offset);
@@ -441,7 +456,7 @@ namespace ALittle
         }
 
         // 规则节点
-        bool AnalysisABnfRuleMatch(ABnfRuleInfo rule, ABnfNodeElement parent, bool not_key
+        private bool AnalysisABnfRuleMatch(ABnfRuleInfo rule, ABnfNodeElement parent, bool not_key
             , ref int line, ref int col, ref int offset
             , ref int pin_offset, bool ignore_error)
         {
@@ -452,7 +467,8 @@ namespace ALittle
             // 跳过空格，制表符，换行
             AnalysisSkip(ref line, ref col, ref offset);
 
-            if (offset >= m_file.m_text.Length) return false;
+            if (offset >= m_file.m_text.Length)
+                return false;
             char next_char = m_file.m_text[offset];
             if (!rule.CheckNextChar(next_char, out List<int> index_list))
                 return false;
@@ -461,7 +477,8 @@ namespace ALittle
             List<ABnfNodeElement> option_list = null;
             foreach (var option_index in index_list)
             {
-                if (!rule.node.PreCheck(m_file, offset)) continue;
+                if (!rule.node.PreCheck(m_file, offset))
+                    continue;
                 var node_list = rule.node.node_list[option_index];
 
                 // 缓存位置
@@ -483,13 +500,15 @@ namespace ALittle
                         , ref sub_pin_offset, false))
                     {
                         // 如果匹配失败，并且内部有pin，那么当前也要设置为pin
-                        if (sub_pin_offset >= 0) temp_pin_offset = sub_pin_offset;
+                        if (sub_pin_offset >= 0)
+                            temp_pin_offset = sub_pin_offset;
                         match = false;
                         break;
                     }
 
                     // 如果匹配失败，并且内部有pin，那么当前也要设置为pin
-                    if (sub_pin_offset >= 0) temp_pin_offset = sub_pin_offset;
+                    if (sub_pin_offset >= 0)
+                        temp_pin_offset = sub_pin_offset;
 
                     // 如果规则本身有pin，那么也要设置为pin
                     if (node_list[index].pin == ABnfRuleNodePinType.NPT_TRUE)
@@ -538,7 +557,8 @@ namespace ALittle
             }
 
             // 没有pin并且忽略错误的情况下，直接返回false
-            if (pin_offset < 0 && ignore_error) return false;
+            if (pin_offset < 0 && ignore_error)
+                return false;
 
             // 处理option_list
             if (option_list != null)
@@ -559,7 +579,8 @@ namespace ALittle
                 for (int i = m_stop_stack.Count - 1; i >= 0; --i)
                 {
                     string stop_token = m_stop_stack[i].GetStopToken();
-                    if (stop_token == null) continue;
+                    if (stop_token == null)
+                        continue;
 
                     int value = m_file.m_text.IndexOf(stop_token, pin_offset, find - pin_offset);
                     if (value >= 0 && find > value)
@@ -573,13 +594,13 @@ namespace ALittle
                     if (m_stop_stack[index] == rule)
                     {
                         AnalysisOffset(find + m_stop_stack[index].GetStopToken().Length - offset, ref line, ref col, ref offset);
-                        parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, "语法错误", null));
+                        parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, "Syntax Error", null));
                         return true;
                     }
                     else if (index == m_stop_stack.Count - 2)
                     {
                         AnalysisOffset(find - offset, ref line, ref col, ref offset);
-                        parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, "语法错误", null));
+                        parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, "Syntax Error", null));
                         return true;
                     }
                 }
@@ -589,7 +610,7 @@ namespace ALittle
         }
 
         // 分析节点
-        bool AnalysisABnfNodeMatch(ABnfRuleInfo rule
+        private bool AnalysisABnfNodeMatch(ABnfRuleInfo rule
             , ABnfRuleNodeInfo node, ABnfNodeElement parent, bool not_key
             , ref int line, ref int col, ref int offset
             , ref int pin_offset, bool ignore_error)
@@ -610,14 +631,15 @@ namespace ALittle
                     if (child == null)
                     {
                         // 如果忽略错误，直接返回false
-                        if (ignore_error) return false;
+                        if (ignore_error)
+                            return false;
                         // 跳过空格，tab，换行
                         AnalysisSkip(ref line, ref col, ref offset);
                         // 添加错误节点
-                        parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, "未知规则:" + node.value.value, null));
+                        parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, "Unknown rule:" + node.value.value, null));
                         return false;
                     }
-                    
+
                     // 添加结束符
                     m_stop_stack.Add(child);
 
@@ -652,7 +674,8 @@ namespace ALittle
             // 跳过空格，制表符，换行
             AnalysisSkip(ref line, ref col, ref offset);
 
-            if (offset >= m_file.m_text.Length) return false;
+            if (offset >= m_file.m_text.Length)
+                return false;
             char next_char = m_file.m_text[offset];
             if (!node.CheckNextChar(m_rule, next_char, out List<int> index_list))
                 return false;
@@ -661,7 +684,8 @@ namespace ALittle
             List<ABnfNodeElement> option_list = null;
             foreach (var option_index in index_list)
             {
-                if (!node.PreCheck(m_file, offset)) continue;
+                if (!node.PreCheck(m_file, offset))
+                    continue;
                 var node_list = node.node_list[option_index];
 
                 // 缓存位置
@@ -683,13 +707,15 @@ namespace ALittle
                         , ref sub_pin_offset, false))
                     {
                         // 如果匹配失败，并且内部有pin，那么当前也要设置为pin
-                        if (sub_pin_offset >= 0) temp_pin_offset = sub_pin_offset;
+                        if (sub_pin_offset >= 0)
+                            temp_pin_offset = sub_pin_offset;
                         match = false;
                         break;
                     }
 
                     // 如果匹配失败，并且内部有pin，那么当前也要设置为pin
-                    if (sub_pin_offset >= 0) temp_pin_offset = sub_pin_offset;
+                    if (sub_pin_offset >= 0)
+                        temp_pin_offset = sub_pin_offset;
 
                     // 如果规则本身有pin，那么也要设置为pin
                     if (node_list[index].pin == ABnfRuleNodePinType.NPT_TRUE)
@@ -741,7 +767,8 @@ namespace ALittle
             }
 
             // 没有pin并且忽略错误的情况下，直接返回false
-            if (pin_offset < 0 && ignore_error) return false;
+            if (pin_offset < 0 && ignore_error)
+                return false;
 
             // 处理option_list
             if (option_list != null)
@@ -760,7 +787,7 @@ namespace ALittle
         }
 
         // 关键字匹配
-        bool AnalysisABnfKeyMatch(ABnfRuleInfo rule
+        private bool AnalysisABnfKeyMatch(ABnfRuleInfo rule
             , ABnfRuleNodeInfo node, ABnfNodeElement parent, bool not_key
             , ref int line, ref int col, ref int offset
             , bool ignore_error)
@@ -800,12 +827,13 @@ namespace ALittle
                 if (rule == m_line_comment || rule == m_block_comment)
                     return false;
                 // 如果忽略错误就跳过
-                if (ignore_error) return false;
+                if (ignore_error)
+                    return false;
                 // 添加错误节点
                 if (offset < m_file.m_text.Length)
-                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "期望匹配" + node.value.value + " 却得到" + m_file.m_text[offset], new ABnfKeyElement(m_factory, m_file, line, col, offset, node.value.value)));
+                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "Expected match " + node.value.value + " but got " + m_file.m_text[offset], new ABnfKeyElement(m_factory, m_file, line, col, offset, node.value.value)));
                 else
-                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "期望匹配" + node.value.value + " 却得到文件结尾", new ABnfKeyElement(m_factory, m_file, line, col, offset, node.value.value)));
+                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "Expected match " + node.value.value + " End of file ", new ABnfKeyElement(m_factory, m_file, line, col, offset, node.value.value)));
                 return false;
             }
 
@@ -816,7 +844,7 @@ namespace ALittle
         }
 
         // 字符串匹配
-        bool AnalysisABnfStringMatch(ABnfRuleInfo rule
+        private bool AnalysisABnfStringMatch(ABnfRuleInfo rule
             , ABnfRuleNodeInfo node, ABnfNodeElement parent, bool not_key
             , ref int line, ref int col, ref int offset
             , bool ignore_error)
@@ -855,12 +883,13 @@ namespace ALittle
                 if (rule == m_line_comment || rule == m_block_comment)
                     return false;
                 // 如果忽略错误就跳过
-                if (ignore_error) return false;
+                if (ignore_error)
+                    return false;
                 // 添加错误节点
                 if (offset < m_file.m_text.Length)
-                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "期望匹配" + node.value.value + " 却得到" + m_file.m_text[offset], new ABnfStringElement(m_factory, m_file, line, col, offset, node.value.value)));
+                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "Expected match " + node.value.value + " but got " + m_file.m_text[offset], new ABnfStringElement(m_factory, m_file, line, col, offset, node.value.value)));
                 else
-                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "期望匹配" + node.value.value + " 却得到文件结尾", new ABnfStringElement(m_factory, m_file, line, col, offset, node.value.value)));
+                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "Expected match " + node.value.value + " but got end of line", new ABnfStringElement(m_factory, m_file, line, col, offset, node.value.value)));
                 return false;
             }
 
@@ -871,7 +900,7 @@ namespace ALittle
         }
 
         // 正则表达式匹配
-        bool AnalysisABnfRegexMatch(ABnfRuleInfo rule
+        private bool AnalysisABnfRegexMatch(ABnfRuleInfo rule
             , ABnfRuleNodeInfo node, ABnfNodeElement parent, bool not_key
             , ref int line, ref int col, ref int offset
             , ref int pin_offset, bool ignore_error)
@@ -926,31 +955,33 @@ namespace ALittle
             }
 
             // 如果是注释那么不添加错误节点
-            if (rule == m_line_comment || rule == m_block_comment) return false;
+            if (rule == m_line_comment || rule == m_block_comment)
+                return false;
             // 如果忽略错误，也不添加错误节点
-            if (ignore_error) return false;
+            if (ignore_error)
+                return false;
 
             // 添加错误节点
             if (offset < m_file.m_text.Length)
             {
                 if (length > 0)
-                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "期望匹配" + node.value.value + " 却得到关键字" + m_file.m_text.Substring(offset, length), new ABnfRegexElement(m_factory, m_file, line, col, offset, "", node.value.regex)));
+                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "Expected match " + node.value.value + " but got the keyword " + m_file.m_text.Substring(offset, length), new ABnfRegexElement(m_factory, m_file, line, col, offset, "", node.value.regex)));
                 else if (length < 0)
                 {
-                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "期望匹配" + node.value.value + " 却只得到" + m_file.m_text.Substring(offset, -length), new ABnfRegexElement(m_factory, m_file, line, col, offset, "", node.value.regex)));
+                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "Expected match " + node.value.value + " but only got " + m_file.m_text.Substring(offset, -length), new ABnfRegexElement(m_factory, m_file, line, col, offset, "", node.value.regex)));
                     AnalysisOffset(-length, ref line, ref col, ref offset);
                     pin_offset = offset - length;
                 }
                 else
-                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "期望匹配" + node.value.value + " 却得到" + m_file.m_text[offset], new ABnfRegexElement(m_factory, m_file, line, col, offset, "", node.value.regex)));
+                    parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "Expected match " + node.value.value + " but got " + m_file.m_text[offset], new ABnfRegexElement(m_factory, m_file, line, col, offset, "", node.value.regex)));
             }
             else
-                parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "期望匹配" + node.value.value + " 却得到文件结尾", new ABnfRegexElement(m_factory, m_file, line, col, offset, "", node.value.regex)));
+                parent.AddChild(new ABnfErrorElement(m_factory, m_file, line, col, offset, rule.id.value + "Expected match " + node.value.value + " but got end of file", new ABnfRegexElement(m_factory, m_file, line, col, offset, "", node.value.regex)));
             return false;
         }
 
         // 行注释匹配
-        bool AnalysisABnfCommentMatch(ABnfRuleInfo rule, ABnfNodeElement parent, bool not_key
+        private bool AnalysisABnfCommentMatch(ABnfRuleInfo rule, ABnfNodeElement parent, bool not_key
             , ref int line, ref int col, ref int offset)
         {
             // 如果是注释，那么直接返回
@@ -988,18 +1019,21 @@ namespace ALittle
                     }
                 }
 
-                if (!match) return true;
+                if (!match)
+                    return true;
             }
         }
 
         // 根据接收的大小，进行偏移
-        void AnalysisOffset(int value_len
+        private void AnalysisOffset(int value_len
             , ref int line, ref int col, ref int offset)
         {
             while (true)
             {
-                if (value_len == 0) break;
-                if (offset >= m_file.m_text.Length) break;
+                if (value_len == 0)
+                    break;
+                if (offset >= m_file.m_text.Length)
+                    break;
 
                 if (m_file.m_text[offset] == '\n')
                 {
@@ -1016,11 +1050,12 @@ namespace ALittle
         }
 
         // 跳到另一行
-        bool JumpToNextLine(ref int line, ref int col, ref int offset)
+        private bool JumpToNextLine(ref int line, ref int col, ref int offset)
         {
             while (true)
             {
-                if (offset >= m_file.m_text.Length) break;
+                if (offset >= m_file.m_text.Length)
+                    break;
 
                 if (m_file.m_text[offset] == '\n')
                 {
@@ -1041,7 +1076,7 @@ namespace ALittle
         }
 
         // 对切割字符进行跳跃
-        void AnalysisSkip(ref int line, ref int col, ref int offset)
+        private void AnalysisSkip(ref int line, ref int col, ref int offset)
         {
             while (offset < m_file.m_text.Length)
             {
@@ -1051,7 +1086,6 @@ namespace ALittle
 
                 if (c == '\r')
                 {
-
                 }
                 else if (c == '\n')
                 {

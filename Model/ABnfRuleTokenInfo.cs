@@ -11,7 +11,7 @@ namespace ALittle
 	    TT_REGEX,			// 正则表达式字符串
         TT_LINE_COMMENT,	// 行注释
         TT_BLOCK_COMMENT,	// 块注释
-	    TT_SYMBOL,			// 符号
+	    TT_SYMBOL,			// Expected 
     };
 
     public class ABnfRuleTokenInfo

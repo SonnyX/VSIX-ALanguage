@@ -1,21 +1,11 @@
-﻿
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Editor;
-using Microsoft.VisualStudio.Language.Intellisense;
+﻿using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Adornments;
-using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Tagging;
-using Microsoft.VisualStudio.TextManager.Interop;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows;
-using System.Windows.Media.Animation;
 
 namespace ALittle
 {
@@ -39,7 +29,7 @@ namespace ALittle
         IVsEditorAdaptersFactoryService m_adapters_factory;
         IVsUIShellOpenDocument m_open_document;
 
-        // 符号配对
+        // Expected 配对
         Dictionary<string, string> m_left_pairs = new Dictionary<string, string>();
         Dictionary<string, string> m_right_pairs = new Dictionary<string, string>();
 

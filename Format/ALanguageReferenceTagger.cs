@@ -1,12 +1,10 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Markup;
 using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Adornments;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 
@@ -79,7 +77,7 @@ namespace ALittle
                     if (cc != null && cc.Children.Count > 0)
                     {
                         var ui = cc.Children[0] as TextBlock;
-                        if (ui != null) ui.Text = "[" + info.count + "个引用]";
+                        if (ui != null) ui.Text = "[" + info.count + " references]";
                     }
                 }
                 else
@@ -106,7 +104,7 @@ namespace ALittle
                     ui.Foreground = brush;
                     var font_size = ui.FontSize;
                     ui.FontSize -= 2;
-                    ui.Text = "[" + info.count + "个引用]";
+                    ui.Text = "[" + info.count + " references]";
                     ui.Foreground.Freeze();
                     (cc as IAddChild).AddChild(ui);
                     Canvas.SetTop(ui, -m_view.LineHeight);

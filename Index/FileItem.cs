@@ -1,11 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.IO;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
-
-namespace ALittle
+﻿namespace ALittle
 {
     public class FileItem
     {
